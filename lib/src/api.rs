@@ -1,4 +1,4 @@
-use std::{rc::Rc, time::Duration};
+use std::{sync::Arc, time::Duration};
 
 use futures::{future::result, Future};
 use tokio;
@@ -16,7 +16,7 @@ use {connector::default_connector, errors::Error};
 #[derive(Clone)]
 pub struct Api {
     url: Option<String>,
-    inner: Rc<ApiInner>,
+    inner: Arc<ApiInner>,
 }
 
 struct ApiInner {
@@ -53,10 +53,7 @@ impl Api {
     /// use telegram_bot_fork::{connector::hyper, Api};
     ///
     /// # let telegram_token = "token";
-    /// let api = Api::with_connector(
-    ///     telegram_token,
-    ///     hyper::default_connector().unwrap(),
-    /// );
+    /// let api = Api::with_connector(telegram_token, hyper::default_connector().unwrap());
     /// # }
     ///
     /// # #[cfg(not(feature = "hyper_connector"))]
@@ -67,13 +64,10 @@ impl Api {
         Ok(Self::with_connector(token, default_connector()?))
     }
 
-    pub fn with_connector<T: AsRef<str>>(
-        token: T,
-        connector: Box<Connector>,
-    ) -> Self {
+    pub fn with_connector<T: AsRef<str>>(token: T, connector: Box<Connector>) -> Self {
         Api {
             url: None,
-            inner: Rc::new(ApiInner {
+            inner: Arc::new(ApiInner {
                 token: token.as_ref().to_string(),
                 connector,
             }),
