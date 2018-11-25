@@ -14,15 +14,15 @@ impl Request for ExportChatInviteLink {
     type Type = JsonRequestType<Self>;
     type Response = JsonIdResponse<String>;
 
-    fn serialize(&self) -> Result<HttpRequest, Error> {
+    fn serialize(&self) -> Result<HttpRequest> {
         Self::Type::serialize(RequestUrl::method("exportChatInviteLink"), self)
     }
 }
 
 impl ExportChatInviteLink {
     pub fn new<C>(chat: C) -> Self
-        where
-            C: ToChatRef,
+    where
+        C: ToChatRef,
     {
         ExportChatInviteLink {
             chat_id: chat.to_chat_ref(),
@@ -36,8 +36,8 @@ pub trait CanExportChatInviteLink {
 }
 
 impl<C> CanExportChatInviteLink for C
-    where
-        C: ToChatRef,
+where
+    C: ToChatRef,
 {
     fn export_chat_invite_link(&self) -> ExportChatInviteLink {
         ExportChatInviteLink::new(self)
